@@ -1,0 +1,31 @@
+.ONESHELL:
+SHELL := /bin/bash
+.DEFAULT_GOAL := build
+
+.PHONY: clean
+clean:
+	@rm -rf build/ install/ log/ logs/ tests/
+
+.PHONY: vcs-import
+vcs-import:
+	@VCS_FILE="${VCS_FILE}"
+	vcs import < ${VCS_FILE}
+
+.PHONY: rosdep-install
+rosdep-install:
+	source ./source_all.sh
+	sudo apt update
+	rosdep update
+	rosdep install -y -r --rosdistro ${ROS_DISTRO} --ignore-src --from-paths src
+
+.PHONY: rosdep-install-eol
+rosdep-install-eol:
+	source ./source_all.sh
+	sudo apt update
+	rosdep update --include-eol-distros
+	rosdep install -y -r --rosdistro ${ROS_DISTRO} --ignore-src --from-paths src
+
+.PHONY: svl
+svl:
+	source ./source_all.sh
+	colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-up-to autonomy_launch svl_launch
