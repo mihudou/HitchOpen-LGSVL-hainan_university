@@ -148,12 +148,22 @@ Please source all the terminals properly.
 
 4. Start the Python API (in Pilot Terminal):
    ```bash
-   python3 src/svl_launch/scripts/launch_ossdc.py --env svl.env
+   python3 src/launch/svl_launch/scripts/launch_ossdc.py --env svl.env
    ```
    Note: Map, sensors, and other configurations can be modified in `race.env`.
 
-5. (in progress)start racing stack (in Pilot Terminal):
-```bash
-  ros2 launch svl_launch svl_all.launch.py
-```
+5. Simulate a dummy joystick, without which the car will not move. it won’t listen to any of your keyboard inputs, it is just there to make the stack think there is a joystick connected.
+   ```bash
+   python3 scripts/dummy_joy_command.py
+   ```
+
+6. (in progress)Start racing stack (in ART Pilot Terminal):
+   ```bash
+   ros2 launch svl_launch svl_all.launch.py
+   ```
+
+7. (in progress)Set parameters to control the vehicle(in Pilot Terminal):
+   ```bash
+   bash ./scripts/autonomous_params.sh
+   ```
 

@@ -1,9 +1,4 @@
 repositories:
-    # Common
-    src/common/race_msgs:
-        type: git
-        url: git@github.com:airacingtech/race_msgs.git
-        version: v0.0.3
     # Autoware
     src/external/autoware/core/autoware_msgs:
         type: git
