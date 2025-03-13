@@ -1,4 +1,4 @@
-# HitchOpen-CIIC
+# HitchOpen-LGSVL
 
 This repository contains the autonomous driving system developed for the HitchOpen project. The system is divided into five main components: perception, localization, planning, control, and simulation.
 
@@ -21,16 +21,16 @@ This repository contains the autonomous driving system developed for the HitchOp
 ### Installation
 We will assume you have ROS2 Iron installed and sourced in all these terminals.
 
-1. Clone `HitchOpen-CIIC` and install `python3-vcstool`:
+1. Clone `HitchOpen-LGSVL` and install `python3-vcstool`:
    ```bash
-   git clone git@github.com:intelligentracing/HitchOpen-CIIC.git
+   git clone git@github.com:intelligentracing/HitchOpen-LGSVL.git
    sudo apt update
    sudo apt install python3-vcstool
    ```
 
 2. Import dependencies:
    ```bash
-   cd HitchOpen-CIIC
+   cd HitchOpen-LGSVL
    make vcs-import VCS_FILE=common.iron.repos
    make vcs-import VCS_FILE=svl.iron.repos # if working on SVL simulator
    ```
@@ -122,7 +122,7 @@ OSSDC-SIM-ART-Linux # (if you downloaded the Linux version)
 ##### Terminal Types
 | Terminal | Type | Description |
 |----------|------|-------------|
-| Pilot Terminal | WSL terminal / Linux terminal | A terminal open in the `HitchOpen-CIIC` folder and sourced. This can be done through `./source_all.sh` |
+| Pilot Terminal | WSL terminal / Linux terminal | A terminal open in the `HitchOpen-LGSVL` folder and sourced. This can be done through `./source_all.sh` |
 | OSSDC Sim Terminal | Windows cmd / WSL terminal / Linux Terminal | A terminal open in the simulator folder (`OSSDC-ART-Linux`) |
 
 ##### Manual Setup
