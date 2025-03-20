@@ -32,7 +32,7 @@ svl_launch = IncludeLaunchDescription(
 )
 
 autonomy_launch = IncludeLaunchDescription(
-    PythonLaunchDescriptionSource(os.path.join(launch_dir, "launch", "autonomy_all.launch.py"))
+    PythonLaunchDescriptionSource(os.path.join(launch_dir, "launch", "misc.launch.py"))
 )
 
 def generate_launch_description():

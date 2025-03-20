@@ -13,22 +13,7 @@
   <depend>rclcpp</depend>
   <exec_depend>base_common</exec_depend>
   <exec_depend>race_metadata</exec_depend>
-  <exec_depend>race_decision_engine</exec_depend>
-  <exec_depend>race_path_planner</exec_depend>
-  <exec_depend>race_vehicle_controller</exec_depend>
-  <exec_depend>vehicle_kinematic_state</exec_depend>
-  <exec_depend>udp_telemetry</exec_depend>
-  <exec_depend>race_telemetry</exec_depend>
-  <exec_depend>manual_control_converter</exec_depend>
-  <exec_depend>autoware_perception_launch</exec_depend>
-  <exec_depend>polygon_transformer</exec_depend>
-  <exec_depend>environs</exec_depend>
-  <exec_depend>race_boundary_localizer</exec_depend>
-  <exec_depend>wall_boundary_segmentation</exec_depend>
-  <exec_depend>velocity_estimation</exec_depend>
-  <exec_depend>robot_localization_interface</exec_depend>
-  <exec_depend>boundary_publisher</exec_depend>
-  <exec_depend>joystick_multiplexer</exec_depend>
+
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

@@ -103,6 +103,13 @@ We maintain a private fork of SVL simulator which adds richer vehicle dynamics t
 #### Installation Steps
 1. Download the release from [here](https://intelligentracingcom-my.sharepoint.com/:u:/g/personal/tianlun_zhang_intelligentracing_com/EVBmsMrNlrVCob8QErwZ7jEBM3x6QQZZTEedvdhRlpJm-w?e=J1WU67) and unzip it.
 2. Download the `wise.zip` file from [here](https://intelligentracingcom-my.sharepoint.com/:u:/g/personal/tianlun_zhang_intelligentracing_com/ES8QdS9l-pBKgFhAtyaUQuQBil8Q7Qc9UqUZAgeWjPncOg?e=2RKUGa) and unzip it in the same folder as the simulator build
+3. Set up [OSSDC API](https://github.com/lgsvl/PythonAPI?tab=readme-ov-file):
+   ```
+   git clone git@github.com:lgsvl/PythonAPI.git
+   cd PythonAPI
+   python3 -m pip install -r requirements.txt --user .
+   ```
+4. Install the correct NVIDIA driver: https://documentation.ubuntu.com/server/how-to/graphics/install-nvidia-drivers/index.html.
 
 #### Expected Folder Structure
 After extraction, you should have a folder structure like this:

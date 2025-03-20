@@ -17,20 +17,8 @@ if env.str("VEHICLE_NAME") == "IAC_CAR" or env.str("VEHICLE_NAME") == "SVL_IAC_C
         default_value=get_share_file("race_metadata", "urdf", "iac_car", "av24.urdf"),
         description="Vehicle we are running",
     )
-elif env.str("VEHICLE_NAME") == "AWSIM_IAC_CAR":
-    vehicle_name_arg = DeclareLaunchArgument(
-        name="urdf_path",
-        default_value=get_share_file("race_metadata", "urdf", "iac_car", "av24.urdf"),
-        description="Vehicle we are running",
-    )
-elif env.str("VEHICLE_NAME") == "HAWAII_GOKART":
-    vehicle_name_arg = DeclareLaunchArgument(
-        name="urdf_path",
-        default_value=get_share_file(
-            "race_metadata", "urdf", "hawaii_gokart", "hawaii_gokart.urdf"
-        ),
-        description="Vehicle we are running",
-    )
+else:
+    raise ValueError("Invalid vehicle name")
 
 gui_arg = DeclareLaunchArgument(
     name="gui",
@@ -73,16 +61,6 @@ joint_state_publisher_gui_node = Node(
     condition=IfCondition(LaunchConfiguration("gui")),
 )
 
-# ---------------------------------------------------------------------------- #
-#                             LAUNCH SYSTEM MONITOR                            #
-# ---------------------------------------------------------------------------- #
-# autoware_sys_monitor_dir = get_package_share_directory("system_monitor")
-# system_monitor_launch = IncludeLaunchDescription(
-#     os.path.join(autoware_sys_monitor_dir, "launch", "system_monitor.launch.xml")
-# )
-# ---------------------------------------------------------------------------- #
-#                           END LAUNCH SYSTEM MONITOR                          #
-# ---------------------------------------------------------------------------- #
 
 
 def generate_launch_description():
@@ -92,6 +70,5 @@ def generate_launch_description():
             vehicle_name_arg,
             gui_arg,
             robot_state_publisher_node,
-            # system_monitor_launch,
         ]
     )
