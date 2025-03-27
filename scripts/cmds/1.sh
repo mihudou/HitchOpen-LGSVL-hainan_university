@@ -1,0 +1,1 @@
+cd OSSDC-SIM-ART-Linux/wise/ && python3 -m http.server 9090

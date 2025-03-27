@@ -1,0 +1,42 @@
+/controller_manager:
+  ros__parameters:
+    # Controller manager settings
+    manager:
+      debug: false
+      control_pub_rate: 50  # Hz
+      plugins:
+        - control::longitudinal::PIDLonController
+        - control::lateral::PurePursuitController
+
+    # Longitudinal control parameters (PID)
+    longitudinal:
+      pid:
+        kp: 0.5
+        ki: 0.1
+        kd: 0.1
+        min_throttle: 0.0
+        max_throttle: 100.0
+        max_velocity: 15.0  # m/s
+
+    # Lateral control parameters (Pure Pursuit)
+    lateral:
+      pure_pursuit:
+        look_ahead_distance: 10.0  # meters
+        wheel_base: 2.987 # meters
+        max_steering_angle: 0.349066  # radians (~20 degrees)
+        smoothing_factor: 0.9  # smoothing factor (0.0-1.0)
+
+/global_planning:
+  ros__parameters:
+    debug: false                        # Enable/disable debug logging
+    visualize: false                    # Enable/disable visualization
+    global_path_publish_rate: 1         # Rate at which global path is published (Hz)
+    local_path_publish_rate: 10         # Rate at which local path is published (Hz)
+    local_path_length_m: 5.0           # Length of local path in meters # this is the next waypoint
+    planning_odom_publish_rate: 10      # Rate at which planning odom is published (Hz)
+    csv_file_path: src/launch/simple_racing/params/output.csv
+
+/autoware_lgsvl_interface:
+  ros__parameters:
+    max_accel_mps2: 1.0
+    max_decel_mps2: -3.0

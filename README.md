@@ -81,7 +81,40 @@ The localization system determines the precise position and orientation of the v
 
 ## Planning
 
-The planning system is responsible for generating safe and optimal global trajectories for autonomous navigation. 
+The planning system is responsible for generating safe and optimal global trajectories for autonomous navigation.
+
+The offline created trajactories are stored in `src/common/race_metadara/ttls`, and the definition of each column are as follows(`src/common/target_trajectory_line/include/ttl.hpp`):
+
+```
+struct TtlHeader
+{
+  std::string ttl_name; # File name
+  TtlIndex number; # Number of the trajectory
+  uint32_t loop; # Number of points
+  double total_distance; # Meters
+  GpsPosition origin; # GPS Coordinate
+};
+
+enum TtlColumn
+{
+  X = 0, #ENU Coordinate
+  Y = 1,
+  Z = 2, 
+  TARGET_YAW = 3, # Rad
+  TARGET_SPEED = 4, # Mile per hour
+  CURVATURE = 5, 
+  DIST_TO_SF_BWD = 6, # Meters
+  DIST_TO_SF_FWD = 7, # Meters
+  REGION = 8, 
+  LEFT_BOUND_X = 9, 
+  LEFT_BOUND_Y = 10, 
+  RIGHT_BOUND_X = 11,
+  RIGHT_BOUND_Y = 12,
+  BANK_ANGLE = 13, # Rad
+  NORMAL_X = 14,
+  NORMAL_Y = 15,
+};
+```
 
 #### Key Algorithms:
 - `Race Path Planner*`: Generates optimal racing lines considering track boundaries and geometry and vehicle dynamics constraints.

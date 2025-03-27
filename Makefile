@@ -28,4 +28,10 @@ rosdep-install-eol:
 .PHONY: svl
 svl:
 	source ./source_all.sh
-	colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-up-to autonomy_launch svl_launch
+	colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-up-to autonomy_launch svl_launch simple_racing
+
+.PHONY: build-select
+build-select:
+	@PACKAGES="${PACKAGES}"
+	source ./source_all.sh
+	colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-select ${PACKAGES}

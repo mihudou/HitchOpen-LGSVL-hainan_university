@@ -1,0 +1,1 @@
+cd OSSDC-SIM-ART-Linux/ && ./start_sim_local.sh
