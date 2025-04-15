@@ -1,1 +1,0 @@
-cd HitchOpen-LGSVL && python3 src/launch/svl_launch/scripts/launch_ossdc.py --env svl.env

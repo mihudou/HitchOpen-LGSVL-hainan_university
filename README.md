@@ -41,7 +41,7 @@ We will assume you have ROS2 Iron installed and sourced in all these terminals.
    pip3 install environs
    ```
 
-4. Install casadi:
+<!-- 4. Install casadi:
    ```bash
    source /opt/ros/iron/setup.bash
    sudo apt install -y gcc g++ gfortran git cmake liblapack-dev pkg-config --install-recommends
@@ -52,9 +52,9 @@ We will assume you have ROS2 Iron installed and sourced in all these terminals.
    sudo make install
    echo export LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):$(LD_LIBRARY_PATH):/usr/local/lib" >> ~/.bashrc
    source ~/.bashrc
-   ```
+   ``` -->
 
-5. (in progress)Build up the stack:
+4. Build up the stack:
    ```bash
    make svl 
    ```
@@ -102,17 +102,6 @@ enum TtlColumn
   Z = 2, 
   TARGET_YAW = 3, # Rad
   TARGET_SPEED = 4, # Mile per hour
-  CURVATURE = 5, 
-  DIST_TO_SF_BWD = 6, # Meters
-  DIST_TO_SF_FWD = 7, # Meters
-  REGION = 8, 
-  LEFT_BOUND_X = 9, 
-  LEFT_BOUND_Y = 10, 
-  RIGHT_BOUND_X = 11,
-  RIGHT_BOUND_Y = 12,
-  BANK_ANGLE = 13, # Rad
-  NORMAL_X = 14,
-  NORMAL_Y = 15,
 };
 ```
 
@@ -190,20 +179,33 @@ Please source all the terminals properly.
    ```bash
    python3 src/launch/svl_launch/scripts/launch_ossdc.py --env svl.env
    ```
-   Note: Map, sensors, and other configurations can be modified in `race.env`.
+   Note: Map, sensors, and other configurations can be modified in `race.env`. Spawn location can be modified in `uuids.json`
 
-5. Simulate a dummy joystick, without which the car will not move. it won’t listen to any of your keyboard inputs, it is just there to make the stack think there is a joystick connected.
+5. Launch urdf (in Pilot Terminal):
    ```bash
-   python3 scripts/dummy_joy_command.py
+   ros2 launch autonomy_launch misc.launch.py
    ```
 
-6. (in progress)Start racing stack (in ART Pilot Terminal):
-   ```bash
-   ros2 launch svl_launch svl_all.launch.py
+
+6. You can directly control the car by publishing topic `/lgsvl/control`. The definition can be found here: https://github.com/lgsvl/lgsvl_msgs/blob/master/msg/VehicleControlData.msg
+   ```
+   std_msgs/Header header
+
+   float32 acceleration_pct  # 0 to 1
+   float32 braking_pct  # 0 to 1
+   float32 target_wheel_angle  # radians
+   float32 target_wheel_angular_rate  # radians / second
+   uint8 target_gear
+
+   uint8 GEAR_NEUTRAL = 0
+   uint8 GEAR_DRIVE = 1
+   uint8 GEAR_REVERSE = 2
+   uint8 GEAR_PARKING = 3
+   uint8 GEAR_LOW = 4
    ```
 
-7. (in progress)Set parameters to control the vehicle(in Pilot Terminal):
+7. You can also run our sample stack (in ART Pilot Terminal):
    ```bash
-   bash ./scripts/autonomous_params.sh
+   ros2 launch simple_racing simple_racing.launch.py params_file:=src/launch/simple_racing/params/simple_racing.yml
    ```
 

@@ -21,11 +21,11 @@ parser.add_argument("--num_cars", help="Number of cars to spawn", default=1, req
 args = parser.parse_args()
 
 # Read the mapping config file
-uuids = json.load(open("install/svl_launch/share/svl_launch/config/uuids.json", "r"))
+uuids = json.load(open("src/launch/svl_launch/config/uuids.json", "r"))
 
 # Read the environment variables from the .env file
 env = Env()
-env.read_env(f"install/svl_launch/share/svl_launch/config/{args.env}")
+env.read_env(f"src/launch/svl_launch/config/{args.env}")
 env.read_env("race.env")
 
 # MAP_NAME = args.map

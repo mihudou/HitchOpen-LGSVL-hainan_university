@@ -1,1 +1,0 @@
-source ~/Desktop/projects/ai_racing/HitchOpen-LGSVL/install/setup.bash && lgsvl_bridge --port 9091
