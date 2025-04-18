@@ -57,6 +57,8 @@ else:
     sim.load(map_uuid)
 sim.set_time_of_day(env.int("TIME_OF_DAY"))
 
+print(f"Map {MAP_NAME} with UUID {map_info['UUID']} loaded")
+
 # get base start position
 # [x, y, z, rx, ry, rz]
 base_start_pos = map_info["BASE_START_POSE"]

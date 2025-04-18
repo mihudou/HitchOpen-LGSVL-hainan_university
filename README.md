@@ -151,11 +151,11 @@ OSSDC-SIM-ART-Linux # (if you downloaded the Linux version)
 ##### Terminal Types
 | Terminal | Type | Description |
 |----------|------|-------------|
-| Pilot Terminal | WSL terminal / Linux terminal | A terminal open in the `HitchOpen-LGSVL` folder and sourced. This can be done through `./source_all.sh` |
+| Pilot Terminal | WSL terminal / Linux terminal | A terminal open in the `HitchOpen-LGSVL` folder and sourced. This can be done through `source ./source_all.sh`. If it does not work, please manually source ROS and your workspace properly. |
 | OSSDC Sim Terminal | Windows cmd / WSL terminal / Linux Terminal | A terminal open in the simulator folder (`OSSDC-ART-Linux`) |
 
 ##### Manual Setup
-Please source all the terminals properly.
+Please source all the terminals properly. Please make sure your ports are not maunally assigned for other purposes. 
 
 1. Start the wise server (in OSSDC Sim Terminal):
    ```bash
@@ -181,7 +181,8 @@ Please source all the terminals properly.
    ```
    Note: Map, sensors, and other configurations can be modified in `race.env`. Spawn location can be modified in `uuids.json`
 
-5. Launch urdf (in Pilot Terminal):
+
+5. Launch urdf if needed(in Pilot Terminal):
    ```bash
    ros2 launch autonomy_launch misc.launch.py
    ```
