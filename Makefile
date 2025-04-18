@@ -28,7 +28,7 @@ rosdep-install-eol:
 .PHONY: svl
 svl:
 	source ./source_all.sh
-	colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-up-to simple_racing autonomy_launch
+	colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-up-to simple_racing autonomy_launch keyboard_controller
 
 .PHONY: build-select
 build-select:

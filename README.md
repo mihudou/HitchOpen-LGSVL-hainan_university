@@ -205,7 +205,12 @@ Please source all the terminals properly. Please make sure your ports are not ma
    uint8 GEAR_LOW = 4
    ```
 
-7. You can also run our sample stack (in ART Pilot Terminal):
+7. Alternatively, keynoard_controller is provided to explore the maps and collect waypoints. You can use `WASD` to maunally control the vehicle in the simulator (in ART Pilot Terminal):
+   ```
+   ros2 run keyboard_controller keyboard_control
+   ```
+
+8. You can also run our sample stack (in ART Pilot Terminal):
    ```bash
    ros2 launch simple_racing simple_racing.launch.py params_file:=src/launch/simple_racing/params/simple_racing.yml
    ```

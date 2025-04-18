@@ -39,7 +39,7 @@ class KeyboardControlNode(Node):
         self.get_logger().info("W: Accelerate")
         self.get_logger().info("S: Brake")
         self.get_logger().info("A/D: Steer Left/Right")
-        self.get_logger().info("R: Toggle Reverse")
+        # self.get_logger().info("R: Toggle Reverse")
         self.get_logger().info("Q: Quit")
 
     def keyboard_listener(self):
