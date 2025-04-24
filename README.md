@@ -198,11 +198,7 @@ Please source all the terminals properly. Please make sure your ports are not ma
    float32 target_wheel_angular_rate  # radians / second
    uint8 target_gear
 
-   uint8 GEAR_NEUTRAL = 0
-   uint8 GEAR_DRIVE = 1
-   uint8 GEAR_REVERSE = 2
-   uint8 GEAR_PARKING = 3
-   uint8 GEAR_LOW = 4
+   # target_gear from 0-6, 0 is neutral, 1-6 is forward gear
    ```
 
 7. Alternatively, keynoard_controller is provided to explore the maps and collect waypoints. You can use `WASD` to maunally control the vehicle in the simulator (in ART Pilot Terminal):
