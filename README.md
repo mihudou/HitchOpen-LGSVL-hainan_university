@@ -122,6 +122,13 @@ The control system is responsible for executing the planned trajectory by genera
 
 We maintain a private fork of SVL simulator which adds richer vehicle dynamics to the vehicle. Combined with accurate sensor configuration, SVL was the ultimate solution for integration testing. 
 
+#### Chassis
+   - Overall Length: 192in/4876mm
+   - Overall Width: 76in/1930mm
+   - Overall Height: 45.5in/1156.5mm
+   - Wheelbase: 117in/2972mm
+   - Curb Weight: 1680lbs/748.43kg
+
 #### Installation Steps
 1. Download the release from [here](https://intelligentracingcom-my.sharepoint.com/:u:/g/personal/tianlun_zhang_intelligentracing_com/EVBmsMrNlrVCob8QErwZ7jEBM3x6QQZZTEedvdhRlpJm-w?e=J1WU67) and unzip it.
 2. Download the `wise.zip` file from [here](https://intelligentracingcom-my.sharepoint.com/:u:/g/personal/tianlun_zhang_intelligentracing_com/ES8QdS9l-pBKgFhAtyaUQuQBil8Q7Qc9UqUZAgeWjPncOg?e=2RKUGa) and unzip it in the same folder as the simulator build
