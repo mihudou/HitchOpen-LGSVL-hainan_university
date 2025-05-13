@@ -70,6 +70,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/PerceptionTelemetry.msg"
   "msg/PerceptionHealthTelemetry.msg"
   "msg/TrackedObjectTelemetry.msg"
+  "msg/VehicleFlag.msg"
 
   DEPENDENCIES builtin_interfaces std_msgs geometry_msgs nav_msgs gps_msgs sensor_msgs vision_msgs
 )
