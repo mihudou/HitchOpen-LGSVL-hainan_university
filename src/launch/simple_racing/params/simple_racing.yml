@@ -34,7 +34,7 @@
     local_path_publish_rate: 10         # Rate at which local path is published (Hz)
     local_path_length_m: 5.0           # Length of local path in meters # this is the next waypoint
     planning_odom_publish_rate: 10      # Rate at which planning odom is published (Hz)
-    csv_file_path: src/launch/simple_racing/params/output.csv
+    csv_file_path: src/launch/simple_racing/params/LVMS_oval.csv
 
 /autoware_lgsvl_interface:
   ros__parameters:

@@ -40,7 +40,7 @@ void AutowareLgsvlInterface::on_control_msg(
   } else {
     // Map deceleration to braking
     lgsvl_msg.acceleration_pct = 0.0f;
-    lgsvl_msg.braking_pct = std::min(std::abs(msg->longitudinal.acceleration) / max_decel, 1.0f);
+    lgsvl_msg.braking_pct = std::abs(std::min(std::abs(msg->longitudinal.acceleration) / max_decel, 1.0f));
   }
 
   // Convert lateral control
@@ -54,6 +54,7 @@ void AutowareLgsvlInterface::on_control_msg(
   } else {
     lgsvl_msg.target_gear = lgsvl_msg.GEAR_NEUTRAL; // brake, no reverse gear
   }
+
 
   // Publish the converted message
   m_lgsvl_control_pub->publish(lgsvl_msg);

@@ -17,6 +17,7 @@ rosdep-install:
 	sudo apt update
 	rosdep update
 	rosdep install -y -r --rosdistro ${ROS_DISTRO} --ignore-src --from-paths src
+	source ./source_all.sh
 
 .PHONY: rosdep-install-eol
 rosdep-install-eol:
@@ -24,14 +25,17 @@ rosdep-install-eol:
 	sudo apt update
 	rosdep update --include-eol-distros
 	rosdep install -y -r --rosdistro ${ROS_DISTRO} --ignore-src --from-paths src
+	source ./source_all.sh
 
 .PHONY: svl
 svl:
 	source ./source_all.sh
-	colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-up-to simple_racing autonomy_launch keyboard_controller
+	colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-up-to simple_racing autonomy_launch keyboard_controller competition_timer
+	source ./source_all.sh
 
 .PHONY: build-select
 build-select:
 	@PACKAGES="${PACKAGES}"
 	source ./source_all.sh
 	colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-select ${PACKAGES}
+	source ./source_all.sh

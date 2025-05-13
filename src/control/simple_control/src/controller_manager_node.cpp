@@ -10,7 +10,11 @@ namespace control
           m_plugin_loader_("simple_control", "control::ControllerInterface")
     {
         this->declare_parameter("manager.debug", false);
+        this->declare_parameter("manager.flag_timeout", 1.0);  // Timeout in seconds
+        
         auto debug_ = this->get_parameter("manager.debug").as_bool();
+        flag_timeout_ = this->get_parameter("manager.flag_timeout").as_double();
+        
         if (debug_)
         {
             RCLCPP_INFO(this->get_logger(), "Debug mode enabled");
@@ -63,6 +67,10 @@ namespace control
             "should_publish_control", 10,
             std::bind(&ControllerManagerNode::should_publish_control_callback, this, std::placeholders::_1));
 
+        vehicle_flag_sub_ = this->create_subscription<race_msgs::msg::VehicleFlag>(
+            "vehicle_flag", 10,
+            std::bind(&ControllerManagerNode::vehicle_flag_callback, this, std::placeholders::_1));
+
         local_path_sub_ = this->create_subscription<autoware_planning_msgs::msg::Path>(
             "local_path", 10,
             std::bind(&ControllerManagerNode::on_local_path_callback, this, std::placeholders::_1));
@@ -76,6 +84,16 @@ namespace control
         control_timer_ = this->create_wall_timer(
             std::chrono::milliseconds(1000 / control_pub_rate_),
             std::bind(&ControllerManagerNode::runStep, this));
+            
+        // Initialize flag check timer (10Hz)
+        flag_check_timer_ = this->create_wall_timer(
+            std::chrono::milliseconds(100),
+            std::bind(&ControllerManagerNode::checkFlagTimeout, this));
+            
+        // Initialize last flag time
+        last_flag_time_ = this->now();
+        
+        RCLCPP_INFO(this->get_logger(), "Flag timeout set to %.1f seconds", flag_timeout_);
     }
 
     void ControllerManagerNode::addController(const std::string &name, const std::string &type)
@@ -98,6 +116,15 @@ namespace control
         should_publish_control_ = msg->data;
     }
 
+    void ControllerManagerNode::vehicle_flag_callback(const race_msgs::msg::VehicleFlag::SharedPtr msg)
+    {
+        vehicle_flag_ = msg->flag;
+        last_flag_time_ = this->now();
+        const char* flag_str = (msg->flag == race_msgs::msg::VehicleFlag::GREEN) ? "GREEN" :
+                             (msg->flag == race_msgs::msg::VehicleFlag::RED) ? "RED" : "BLACK";
+        RCLCPP_DEBUG(this->get_logger(), "Vehicle flag updated to: %s", flag_str);
+    }
+
     void ControllerManagerNode::on_local_path_callback(const autoware_planning_msgs::msg::Path::SharedPtr msg)
     {
         local_path_ = msg;
@@ -110,15 +137,19 @@ namespace control
 
     void ControllerManagerNode::runStep()
     {
-        if (!should_publish_control_)
+        // Only run control when flag is GREEN
+        if (!should_publish_control_ || vehicle_flag_ != race_msgs::msg::VehicleFlag::GREEN)
         {
-            // publish brake control
+            // publish brake control for RED or BLACK flag
             autoware_control_msgs::msg::Control control;
-            control.longitudinal.acceleration = -0.5; // brake
+            control.longitudinal.acceleration = -3; // brake
             control.longitudinal.is_defined_acceleration = true;
             control.lateral.steering_tire_angle = 0.0;
             control_pub_->publish(control);
-            // RCLCPP_WARN(this->get_logger(), "Not publishing control because should_publish_control is false");
+            
+            const char* flag_str = (vehicle_flag_ == race_msgs::msg::VehicleFlag::RED) ? "RED" :
+                                 (vehicle_flag_ == race_msgs::msg::VehicleFlag::BLACK) ? "BLACK" : "UNKNOWN";
+            RCLCPP_DEBUG(this->get_logger(), "Braking due to vehicle flag = %s", flag_str);
             return;
         }
         
@@ -167,6 +198,18 @@ namespace control
             .yaw = tf2::getYaw(tf2::Quaternion(odom_->pose.pose.orientation.x, odom_->pose.pose.orientation.y, odom_->pose.pose.orientation.z, odom_->pose.pose.orientation.w)),
             .velocity = odom_->twist.twist.linear.x
         });
+    }
+
+    void ControllerManagerNode::checkFlagTimeout()
+    {
+        auto current_time = this->now();
+        double time_since_last_flag = (current_time - last_flag_time_).seconds();
+        
+        if (time_since_last_flag > flag_timeout_ && vehicle_flag_ != race_msgs::msg::VehicleFlag::RED)
+        {
+            RCLCPP_WARN(this->get_logger(), "No flag received for %.1f seconds, defaulting to RED", time_since_last_flag);
+            vehicle_flag_ = race_msgs::msg::VehicleFlag::RED;
+        }
     }
 } // namespace control
 

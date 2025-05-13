@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = 'keyboard_controller'
+package_name = 'competition_timer'
 
 setup(
     name=package_name,
@@ -12,19 +12,19 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
-        (os.path.join('share', package_name, 'config'), glob('config/*.yaml'))
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')), 
+        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
     ],
     install_requires=['setuptools', 'pymap3d'],
     zip_safe=True,
     maintainer='roar-tl',
     maintainer_email='ztl1998@berkeley.edu',
-    description='Keyboard controller for SVL vehicle control',
+    description='Competition Timer',
     license='',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'keyboard_control = keyboard_controller.keyboard_control_node:main',
+            'competition_timer = competition_timer.competition_timer:main',
         ],
     },
 )

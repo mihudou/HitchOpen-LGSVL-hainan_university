@@ -132,3 +132,6 @@ tmp_*
 *.onnx
 *.pt
 *.pth
+
+competition_results/**
+src/control/keyboard_controller/collected_waypoints/**
