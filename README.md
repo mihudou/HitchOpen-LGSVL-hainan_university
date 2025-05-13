@@ -223,10 +223,10 @@ Please source all the terminals properly. Please make sure your ports are not ma
 The simulation environment provides a comprehensive race competition system with integrated timing and flag control. This allows for realistic race scenario testing and evaluation.
 
 1. Competition timer (Please do not modify anything in competition_timer for your final submission)
-   - Records the laps you are currently on and clocks the time. 
+   - Keeps track of the laps number and clocks the time. 
    - Configuration options:
       - Map is set in `race.env`
-      - `results_dir`: Directory for competition results
+      - `results_dir`: Directory to save competition results
       - `target_laps`: Number of laps to complete (default: 10)
       - `vehicle_flag`: Initial flag state (default: 'red')
    - You can start the competition timer by:
@@ -235,7 +235,7 @@ The simulation environment provides a comprehensive race competition system with
       ```
 2. Flags
    - The competition timer publishes VehicleFlag on the `/vehicle_flag` topic
-   - Flag states control competition flow:
+   - Flags in the competition:
      - GREEN: Competition active, vehicle can go
      - RED: Vehicle must stop
      - BLACK: Competition ended
@@ -244,7 +244,7 @@ The simulation environment provides a comprehensive race competition system with
       ros2 param set /competition_timer_node vehicle_flag green
       ```
    - Vehicles MUST subscribe to `/vehicle_flag` topic and respond to flag states. If no flag is received, vehicle must assume RED flag.
-   - Black flag is published at the end of the competition. You do not need to respones it in the simulation now, but please try to make sure your vehicle can stop safely after finishing the competition.
+   - Black flag is published at the end of the competition. You do not need to response to it in the simulation now, but please try to make sure your vehicle can stop safely after finishing the competition.
 
 3. Competition States
    - Start: Competition begins with GREEN flag. Timer starts.
