@@ -197,12 +197,13 @@ class CompetitionTimerNode(Node):
             
             if self.current_lap > 0:
                 self.get_logger().info(f'Finish line crossed at {crossing_time}')
-            # Update lap count
-            self.current_lap += 1
             
             # Calculate and publish lap time
             if self.last_crossing_time is not None:
-                lap_time = crossing_time - self.last_crossing_time
+                if self.current_lap == 1:
+                    lap_time = crossing_time - self.start_time
+                else:
+                    lap_time = crossing_time - self.last_crossing_time
                 
                 # Publish lap time
                 time_msg = Float32()
@@ -211,17 +212,18 @@ class CompetitionTimerNode(Node):
                 
                 # Record lap time
                 self.lap_times.append(lap_time)
-                self.get_logger().info(f'Lap {self.current_lap - 1} completed in {lap_time:.2f} seconds')
+                self.get_logger().info(f'Lap {self.current_lap} completed in {lap_time:.3f} seconds')
                 
                 # Check if target laps reached
-                if self.current_lap > self.target_laps:
-                    self.end_time = self.current_time
+                if self.current_lap >= self.target_laps:
+                    self.end_time = crossing_time
                     self.get_logger().info(f'Target laps ({self.target_laps}) reached! Ending race. at {self.end_time}');
                     # Set vehicle flag to black to end the race
                     self.set_parameters([rclpy.parameter.Parameter('vehicle_flag', rclpy.Parameter.Type.STRING, 'black')])
                     self.vehicle_flag = VehicleFlag.BLACK
                     self.get_logger().info(f'Vehicle flag set to: {self._flag_to_string[self.vehicle_flag]}')
             
+            self.current_lap += 1
             self.last_crossing_time = crossing_time
 
     def check_finish_line_crossing(self, x, y):
@@ -265,8 +267,8 @@ class CompetitionTimerNode(Node):
             return
         else:
             self.get_logger().info(f'Competition started at {self.start_time}')
-            self.get_logger().info(f'Competition ended at {self.current_time}')
-            self.get_logger().info(f'Total time: {self.current_time - self.start_time:.3f} seconds')
+            self.get_logger().info(f'Competition ended at {self.end_time}')
+            self.get_logger().info(f'Total time: {self.end_time - self.start_time:.3f} seconds')
 
         if not self.lap_times:
             self.get_logger().warn('No lap times to save')

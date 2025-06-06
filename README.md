@@ -228,7 +228,7 @@ The simulation environment provides a comprehensive race competition system with
       - Map is set in `race.env`
       - `results_dir`: Directory to save competition results
       - `target_laps`: Number of laps to complete (default: 10)
-      - `vehicle_flag`: Initial flag state (default: 'red')
+      - `vehicle_flag`: Initial flag (default: 'red')
    - You can start the competition timer by:
       ```bash
       ros2 launch competition_timer competition_timer.launch.py use_sim_time:=true
@@ -236,18 +236,19 @@ The simulation environment provides a comprehensive race competition system with
 2. Flags
    - The competition timer publishes VehicleFlag on the `/vehicle_flag` topic
    - Flags in the competition:
-     - GREEN: Competition active, vehicle can go
+     - GREEN: Competition is active, vehicles can go
      - RED: Vehicle must stop
-     - BLACK: Competition ended
+     - BLACK: Competition ends
    - The competition is started by manually setting the flag to green:
       ```bash
       ros2 param set /competition_timer_node vehicle_flag green
       ```
    - Vehicles MUST subscribe to `/vehicle_flag` topic and respond to flag states. If no flag is received, vehicle must assume RED flag.
-   - Black flag is published at the end of the competition. You do not need to response to it in the simulation now, but please try to make sure your vehicle can stop safely after finishing the competition.
+   - Black flag is published upon the completion of the target laps or early termination. You do not need to respond to it in the simulation now, but please try to make sure your vehicles can stop safely after finishing the competition.
 
 3. Competition States
-   - Start: Competition begins with GREEN flag. Timer starts.
+   - Inactive: Simulation Competition is launched with deault RED flag. Vechiles are not allowed to move.
+   - Start: Competition begins with GREEN flag. Timer starts. 
    - Pause: Red flag might be published during the competition due to safety reasons and abnormal vehicle behavior. Timer does not pasue.
    - End: Vehicles have finished the target_laps or BLACK flag is published early to stop the competition.
 
