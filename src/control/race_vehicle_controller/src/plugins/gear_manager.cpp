@@ -1,200 +1,96 @@
-// Copyright 2024 AI Racing Tech
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 #include <memory>
 #include <vector>
+#include <algorithm>
+#include <iostream>
 
 #include "rclcpp/rclcpp.hpp"
-
 #include "race_msgs/msg/vehicle_control_command.hpp"
 #include "base_common/pubsub.hpp"
-
 #include "race_vehicle_controller/plugin.hpp"
 
-namespace race
-{
+namespace race {
 
-class Gear
-{
+class Gear {
 public:
-  explicit Gear(const int8_t & index, const double & min_rpm, const double & max_rpm)
-  : m_index_(index), m_min_rpm_(min_rpm), m_max_rpm_(max_rpm)
-  {}
+  Gear(int8_t index, double min_rpm, double max_rpm)
+    : index_(index), min_rpm_(min_rpm), max_rpm_(max_rpm) {}
 
-  explicit Gear(const Gear & gear)
-  : m_index_(gear.m_index_), m_min_rpm_(gear.m_min_rpm_), m_max_rpm_(gear.m_max_rpm_)
-  {}
-
-  const int8_t & get_gear_number() const
-  {
-    return m_index_;
-  }
-
-  const double & get_min_rpm() const
-  {
-    return m_min_rpm_;
-  }
-
-  const double & get_max_rpm() const
-  {
-    return m_max_rpm_;
-  }
+  int8_t get_number() const { return index_; }
+  double get_min_rpm() const { return min_rpm_; }
+  double get_max_rpm() const { return max_rpm_; }
 
 private:
-  int8_t m_index_;
-  double m_min_rpm_;
-  double m_max_rpm_;
+  int8_t index_;
+  double min_rpm_;
+  double max_rpm_;
 };
 
-class Gearbox
-{
+class Gearbox {
 public:
-  Gearbox() {}
-  Gearbox(std::vector<Gear> gears, int8_t initial_gear_number)
-  : m_gears_(gears)
-  {
-    if (gears.size() == 0) {
-      throw std::logic_error("Number of gears must be greater than zero.");
+  Gearbox(std::vector<Gear> gears, int8_t initial_gear) : gears_(std::move(gears)) {
+    if (gears_.empty()) {
+      throw std::logic_error("No gears provided!");
     }
-
-    if (!set_gear(initial_gear_number)) {
-      throw std::runtime_error("Gearbox initialization failed.");
+    if (!set_gear(initial_gear)) {
+      throw std::runtime_error("Initial gear invalid!");
     }
   }
 
-  /**
-   * @brief Check if the RPM is below minimum, and check if the current gear is not the lowest gear
-   *
-   * @param rpm current engine PRM
-   * @return if both conditions are true
-   */
-  bool should_downshift(const double & rpm) const
-  {
-    return rpm < m_current_gear_->get_min_rpm() && !is_lowest_gear();
+  bool should_upshift(double rpm) const {
+    return rpm > current_->get_max_rpm() && !is_top();
   }
 
-  /**
-   * @brief Check if the RPM is above maximum, and check if the current gear is not the top gear
-   *
-   * @param rpm current engine PRM
-   * @return if both conditions are true
-   */
-  bool should_upshift(const double & rpm) const
-  {
-    return rpm > m_current_gear_->get_max_rpm() && !is_top_gear();
+  bool should_downshift(double rpm) const {
+    return rpm < current_->get_min_rpm() && !is_bottom();
   }
 
-  /**
-   * @brief Check if the current gear is the lowest gear
-   *
-   * @return if the current gear is the lowest gear
-   */
-  bool is_lowest_gear() const
-  {
-    return std::find_if(
-      m_gears_.begin(), m_gears_.end(), [this](const Gear & g) {
-        return g.get_gear_number() < m_current_gear_->get_gear_number();
-      }) == m_gears_.end();
-  }
-
-  /**
-   * @brief Check if the current gear is the top gear
-   *
-   * @return if the current gear is the top gear
-   */
-  bool is_top_gear() const
-  {
-    return std::find_if(
-      m_gears_.begin(), m_gears_.end(), [this](const Gear & g) {
-        return g.get_gear_number() > m_current_gear_->get_gear_number();
-      }) == m_gears_.end();
-  }
-
-  /**
-   * @brief Downshift. User is responsible for checking feasibility with `should_downshift`.
-   *
-   * @return If downshift succeeds. Error will be printed to std:cerr and the operation will be ignored.
-   */
-  bool downshift()
-  {
-    return set_gear(m_current_gear_->get_gear_number() - 1);
-  }
-
-  /**
-   * @brief Upshift. User is responsible for checking feasibility with `should_upshift`.
-   *
-   * @return If upshift succeeds. Error will be printed to `std:cerr` and the operation will be ignored.
-   */
-  bool upshift()
-  {
-    return set_gear(m_current_gear_->get_gear_number() + 1);
-  }
-
-  /**
-   * @brief Force set gear
-   *
-   * @param gear_number
-   * @return If gearshift succeeds.
-   */
-  bool set_gear(const int8_t & gear_number)
-  {
-    const auto target_gear =
-      std::find_if(
-      m_gears_.begin(), m_gears_.end(), [gear_number](const Gear & g) {
-        return g.get_gear_number() == gear_number;
-      });
-    if (target_gear == m_gears_.end()) {
-      std::cerr << "Cannot set gear to " << gear_number;
-      return false;
-    } else {
-      m_current_gear_ = target_gear;
+  bool set_gear(int8_t gear_number) {
+    auto it = std::find_if(gears_.begin(), gears_.end(),
+      [gear_number](const Gear& g) { return g.get_number() == gear_number; });
+    if (it != gears_.end()) {
+      current_ = it;
       return true;
     }
+    std::cerr << "Gearbox: Invalid gear set attempt: " << (int)gear_number << "\n";
+    return false;
   }
 
-  /**
-   * @brief Get the current gear number
-   *
-   * @return gear number
-   */
-  int8_t get_current_gear_number()
-  {
-    return m_current_gear_->get_gear_number();
+  int8_t get_gear() const { return current_->get_number(); }
+
+  int8_t next_gear() const {
+    for (const auto& g : gears_) {
+      if (g.get_number() > current_->get_number()) {
+        return g.get_number();
+      }
+    }
+    return current_->get_number();
   }
 
-  /**
-   * @brief Check if gear number is valid
-   *
-   * @param gear_number
-   * @return if valid
-   */
-  bool has_gear(const int8_t & gear_number)
-  {
-    return std::find_if(
-      m_gears_.begin(), m_gears_.end(), [gear_number](const Gear & g) {
-        return g.get_gear_number() == gear_number;
-      }) != m_gears_.end();
+  int8_t prev_gear() const {
+    for (auto it = gears_.rbegin(); it != gears_.rend(); ++it) {
+      if (it->get_number() < current_->get_number()) {
+        return it->get_number();
+      }
+    }
+    return current_->get_number();
   }
 
 private:
-  std::vector<Gear> m_gears_;
-  std::vector<Gear>::const_iterator m_current_gear_;
+  bool is_top() const {
+    return std::none_of(gears_.begin(), gears_.end(),
+      [this](const Gear& g) { return g.get_number() > current_->get_number(); });
+  }
+
+  bool is_bottom() const {
+    return std::none_of(gears_.begin(), gears_.end(),
+      [this](const Gear& g) { return g.get_number() < current_->get_number(); });
+  }
+
+  std::vector<Gear> gears_;
+  std::vector<Gear>::const_iterator current_;
 };
 
-enum class GearShiftStatus : uint8_t
-{
+enum class GearShiftStatus : uint8_t {
   UNINITIALIZED,
   AVAILABLE,
   LOCKEDOUT,
@@ -202,9 +98,7 @@ enum class GearShiftStatus : uint8_t
   DOWNSHIFTING
 };
 
-struct ATManagerConfig
-{
-  typedef std::shared_ptr<ATManagerConfig> SharedPtr;
+struct ATManagerConfig {
   std::vector<int8_t> gear_numbers;
   std::vector<double> min_rpms;
   std::vector<double> max_rpms;
@@ -212,10 +106,121 @@ struct ATManagerConfig
   double gear_change_wait_sec;
 };
 
-/**
- * @brief Automatic transmission manager
- *
- */
+class ATManager {
+public:
+  ATManager(rclcpp::Node& node, const ATManagerConfig& cfg)
+    : node_(node), gearbox_(build_gears(cfg), cfg.start_gear),
+      change_wait_sec_(cfg.gear_change_wait_sec) {
+    gear_cmd_ = cfg.start_gear;
+  }
+
+  void update(double stamp, int8_t gear, uint8_t status, double rpm) {
+    current_stamp_ = stamp;
+    current_rpm_ = rpm;
+    shift_status_ = static_cast<GearShiftStatus>(status);
+    physical_gear_ = gear;
+    step();
+  }
+
+  int8_t get_gear_cmd() const { return gear_cmd_; }
+
+  bool is_shifting() const { return waiting_; }
+
+private:
+  std::vector<Gear> build_gears(const ATManagerConfig& cfg) {
+    std::vector<Gear> out;
+    for (size_t i = 0; i < cfg.gear_numbers.size(); ++i) {
+      out.emplace_back(cfg.gear_numbers[i], cfg.min_rpms[i], cfg.max_rpms[i]);
+    }
+    return out;
+  }
+
+  void step() {
+    constexpr double MAX_WAIT = 2.0;
+
+    if (current_rpm_ < 500) return; // Engine not running
+
+    if (waiting_) {
+      if (current_stamp_ - last_shift_ > MAX_WAIT) {
+        RCLCPP_WARN(node_.get_logger(), "Gear shift timeout; resetting");
+        waiting_ = false;
+      }
+      return;
+    }
+
+    if (gearbox_.get_gear() != physical_gear_) {
+      RCLCPP_WARN(node_.get_logger(), "Resync gear: ECU=%d", physical_gear_);
+      gearbox_.set_gear(physical_gear_);
+      gear_cmd_ = physical_gear_;
+    }
+
+    if (gearbox_.should_upshift(current_rpm_)) {
+      gear_cmd_ = gearbox_.next_gear();
+      last_shift_ = current_stamp_;
+      waiting_ = true;
+      RCLCPP_INFO(node_.get_logger(), "Upshift to %d at RPM %.1f", gear_cmd_, current_rpm_);
+    } else if (gearbox_.should_downshift(current_rpm_)) {
+      gear_cmd_ = gearbox_.prev_gear();
+      last_shift_ = current_stamp_;
+      waiting_ = true;
+      RCLCPP_INFO(node_.get_logger(), "Downshift to %d at RPM %.1f", gear_cmd_, current_rpm_);
+    }
+  }
+
+  rclcpp::Node& node_;
+  Gearbox gearbox_;
+  double change_wait_sec_;
+  int8_t gear_cmd_;
+  int8_t physical_gear_ = 0;
+  double current_stamp_ = 0;
+  double current_rpm_ = 0;
+  GearShiftStatus shift_status_;
+  bool waiting_ = false;
+  double last_shift_ = 0;
+};
+
+class GearManagerPlugin : public RvcPlugin {
+public:
+  bool configure() override {
+    auto nums = node().declare_parameter("gear_manager.gear_numbers", std::vector<int64_t>{});
+    auto min = node().declare_parameter("gear_manager.min_rpms", std::vector<double>{});
+    auto max = node().declare_parameter("gear_manager.max_rpms", std::vector<double>{});
+    auto start = static_cast<int8_t>(node().declare_parameter("gear_manager.start_gear", 1));
+    auto wait = node().declare_parameter("gear_manager.gear_change_wait_sec", 0.5);
+
+    ATManagerConfig cfg{
+      std::vector<int8_t>(nums.begin(), nums.end()),
+      min, max, start, wait
+    };
+    manager_ = std::make_unique<ATManager>(node(), cfg);
+    return true;
+  }
+
+  bool compute_control_command(VehicleControlCommand& out) override {
+    if (has_report_) {
+      out.gear_cmd = manager_->get_gear_cmd();
+    } else {
+      RCLCPP_INFO_THROTTLE(node().get_logger(), *node().get_clock(), 1000, "Waiting for engine report...");
+    }
+    return true;
+  }
+
+  void on_engine_report_update() override {
+    auto msg = const_state().engine_report;
+    manager_->update(rclcpp::Time(msg->stamp).seconds(), msg->current_gear, msg->gear_shift_status, msg->engine_rpm);
+    has_report_ = true;
+  }
+
+private:
+  std::unique_ptr<ATManager> manager_;
+  bool has_report_ = false;
+};
+
+}  // namespace race
+
+#include "pluginlib/class_list_macros.hpp"
+PLUGINLIB_EXPORT_CLASS(race::GearManagerPlugin, race::RvcPlugin)
+
 class ATManager
 {
 public:
